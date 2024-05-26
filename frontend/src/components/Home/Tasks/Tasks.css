@@ -1,0 +1,10 @@
+.tasks-container {
+    display: flex;
+    flex-wrap: wrap;
+}
+
+.task-card {
+    flex: 1 0 20%;
+    margin: 0 2px 10px;
+    /* Остальные стили */
+}

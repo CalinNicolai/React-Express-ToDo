@@ -1,0 +1,20 @@
+
+.AddTask {
+    position: fixed;
+    bottom: 20px; /* Отступ от нижнего края */
+    right: 20px; /* Отступ от правого края */
+    width: 50px; /* Ширина кнопки */
+    height: 50px; /* Высота кнопки */
+    border-radius: 50%; /* Делаем кнопку круглой */
+    background-color: #007bff; /* Цвет фона кнопки */
+    color: white; /* Цвет текста */
+    border: none; /* Убираем границу */
+    font-size:xx-large; /* Размер шрифта */
+    z-index: 9999; /* Поверх всего остального контента */
+    cursor: pointer; /* Изменяем вид курсора */
+}
+
+.AddTask:hover {
+    background-color: #0056b3; /* Изменение цвета кнопки при наведении курсора */
+    text-decoration: none;
+}

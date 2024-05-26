@@ -1,0 +1,55 @@
+/* Стили для контейнера формы */
+.form-container {
+    display: flex;
+    justify-content: center; /* Горизонтальное выравнивание по центру */
+    align-items: center; /* Вертикальное выравнивание по центру */
+    height: 100vh;
+}
+
+/* Стили для самой формы */
+form {
+    background: #f4f4f4;
+    padding: 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    max-width: 400px;
+    width: 100%;
+    text-align: center;
+}
+
+/* Стили для инпутов и меток */
+label {
+    display: block;
+    margin: 10px 0;
+}
+
+input {
+    width: 95%;
+    padding: 10px;
+    margin: 5px 0;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+}
+
+/* Стили для кнопки */
+
+button{
+    border: none;
+    cursor: pointer;
+}
+button:hover{
+    text-decoration: underline;
+}
+.submit {
+    margin: 10px auto;
+    display: block;
+    width: 50%;
+    padding: 10px;
+    background: #007bff;
+    color: #fff;
+    border-radius: 3px;
+}
+
+.submit:hover {
+    background: #0056b3;
+}
