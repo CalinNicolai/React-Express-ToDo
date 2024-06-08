@@ -1,5 +1,6 @@
 const taskService = require('../service/task-service')
 const ApiError = require('../exceptions/api-error')
+const {_logFunc} = require("nodemailer/lib/shared");
 
 class TaskController {
     async createTask(req, res, next) {
@@ -14,6 +15,7 @@ class TaskController {
 
     async changeTask(req, res, next) {
         try {
+            console.log(req.body)
             const {_id, title, description, creationDate, deadline, category, userId} = req.body
             const changedTask = await taskService.changeTask(_id, title, description, creationDate, deadline, category, userId)
             return res.json(changedTask)
@@ -35,7 +37,6 @@ class TaskController {
     async deleteTask(req, res, next) {
         try {
             const {taskId} = req.params
-            console.log(taskId)
             await taskService.deleteTask(taskId)
             return res.status(200).json({message: 'Задача успешно удалена'});
         } catch (e) {

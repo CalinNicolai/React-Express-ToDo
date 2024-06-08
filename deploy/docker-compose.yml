@@ -1,29 +1,4 @@
 services:
-  frontend:
-    container_name: frontend
-    build:
-      context: ../frontend
-      dockerfile: .dockerfile
-    ports:
-      - "3000:3000"
-    volumes:
-      - ../frontend:/app
-    depends_on:
-      - backend
-
-  backend:
-    container_name: backend
-    build:
-      context: ../server
-      dockerfile: .dockerfile
-    ports:
-      - "5000:5000"
-    volumes:
-      - ../server:/app
-    environment:
-      - MONGO_URI=mongodb://mongo:27017/
-    depends_on:
-      - mongo
 
   mongo:
     image: mongo

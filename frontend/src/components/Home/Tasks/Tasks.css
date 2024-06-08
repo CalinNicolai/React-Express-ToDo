@@ -1,10 +1,15 @@
-.tasks-container {
-    display: flex;
-    flex-wrap: wrap;
+.card {
+    transition: background-color 0.3s, border-color 0.3s;
 }
 
-.task-card {
-    flex: 1 0 20%;
-    margin: 0 2px 10px;
-    /* Остальные стили */
+.card.hovered {
+    background-color: rgba(0, 0, 0, 0.1);
+}
+
+.card:hover {
+    cursor: pointer;
+}
+
+.card.border-danger {
+    border-color: red;
 }

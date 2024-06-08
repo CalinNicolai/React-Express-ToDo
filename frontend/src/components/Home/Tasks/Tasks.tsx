@@ -1,6 +1,7 @@
 import React, {useState} from "react";
 import {Button, Modal, Row, Col} from "react-bootstrap";
 import {ITask} from "../../../UNIT/models/ITask";
+import './Tasks.css'
 import TaskService from "../../../UNIT/Services/TaskService";
 import FilterTable from "../Filter/Filter";
 import {FilterParams} from '../Filter/IFilterParams';
@@ -10,14 +11,14 @@ interface TasksPromps {
     handleBtn: (set: boolean) => void;
     tasks: ITask[];
     setTasks: (set: ITask[]) => void;
-    openModal: () => void;
+    openModal: (change: boolean) => void;
     selectedTask: ITask | null;
-    setSelectedTask: (set: ITask) => void;
+    setSelectedTask: (set: ITask | null) => void;
 }
 
 const Tasks: React.FC<TasksPromps> = ({handleBtn, tasks, setTasks, openModal, selectedTask, setSelectedTask}) => {
     const [filterParams, setFilterParams] = useState<FilterParams>();
-
+    const [isHovered, setIsHovered] = useState<string>('');
     function handleFilterParams(Params: FilterParams) {
         setFilterParams(() => {
             return Params;
@@ -29,16 +30,16 @@ const Tasks: React.FC<TasksPromps> = ({handleBtn, tasks, setTasks, openModal, se
         switch (method) {
             case "createdAsc":
                 sortedTasks.sort((a, b) => {
-                    const dateA = new Date(a.creationDate);
-                    const dateB = new Date(b.creationDate);
+                    const dateA: Date = new Date(a.creationDate);
+                    const dateB: Date = new Date(b.creationDate);
                     return dateA.getTime() - dateB.getTime();
                 });
 
                 break;
             case "createdDesc":
                 sortedTasks.sort((a, b) => {
-                    const dateA = new Date(a.creationDate);
-                    const dateB = new Date(b.creationDate);
+                    const dateA: Date = new Date(a.creationDate);
+                    const dateB: Date = new Date(b.creationDate);
                     return dateB.getTime() - dateA.getTime();
                 });
 
@@ -56,10 +57,12 @@ const Tasks: React.FC<TasksPromps> = ({handleBtn, tasks, setTasks, openModal, se
     }
 
     const handleDeleteTask = async (taskId: string) => {
+        console.log(taskId)
         try {
             await TaskService.deleteTask(taskId);
             let tasksDeleted = tasks.filter(task => task._id !== taskId);
             setTasks(tasksDeleted);
+            // setSelectedTask(null);
             toast.success("Task deleted successfully");
         } catch (e: any) {
             console.log(e);
@@ -110,24 +113,33 @@ const Tasks: React.FC<TasksPromps> = ({handleBtn, tasks, setTasks, openModal, se
                          handleSortMethod={handleSortMethod}/>
             <div
                 className="tasks-container m-2">
-                <Row xs={1} md={2} className="g-4">
-                    {filteredTasks.map((task: ITask, index) => (
-                        <Col key={index}
-                             onClick={() => openTaskDetails(task)}>
-                            <div
-                                className={`border-2 rounded-2 text-center ${isDeadlineExpired(task) ? 'bg-secondary' : (getTimeLeft(task.deadline) === "1 Day" ? 'bg-warning' : 'bg-primary')}`}>
-                                <div className="task-card col-6 mb-3">
-                                    <h3>{task.title}</h3>
-                                    <p>{task.description.slice(0, 50)}...</p>
-                                    <button className='btn btn-danger' onClick={(e) => {
-                                        handleDeleteTask(task._id);
-                                    }}>Delete
-                                    </button>
+                <div className="task-list">
+                    {filteredTasks.map((task, index) => (
+                        <div
+                            key={index}
+                            className={`card ${isDeadlineExpired(task) ? "border-danger" : ""} ${
+                                isHovered === task._id ? "hovered" : ""
+                            }`}
+                            onMouseEnter={() => setIsHovered(task._id)}
+                            onMouseLeave={() => setIsHovered('')}
+                            onClick={() =>{
+                                openTaskDetails(task);
+                            }}
+                        >
+                            <div className="card-body d-flex justify-content-between align-items-center">
+                                <div>
+                                    <h5 className="card-title">
+                                        {task.title.length > 60 ? task.title.slice(0, 60) + "..." : task.title}
+                                    </h5>
+                                    <p className="card-text">{task.description}</p>
                                 </div>
+                                <button className="btn btn-danger" onClick={() => handleDeleteTask(task._id)}>
+                                    X
+                                </button>
                             </div>
-                        </Col>
+                        </div>
                     ))}
-                </Row>
+                </div>
 
             </div>
 
@@ -144,7 +156,9 @@ const Tasks: React.FC<TasksPromps> = ({handleBtn, tasks, setTasks, openModal, se
                     </Modal.Body>
                     <Modal.Footer>
                         <Button variant="secondary" onClick={closeTaskDetails}>Close</Button>
-                        <Button variant="secondary" onClick={openModal}>Change</Button>
+                        <Button variant="secondary" onClick={() => {
+                            openModal(true)
+                        }}>Change</Button>
                     </Modal.Footer>
                 </Modal>
             )}

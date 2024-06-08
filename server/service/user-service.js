@@ -8,9 +8,33 @@ const ApiError = require('../exceptions/api-error');
 
 class UserService {
     async registration(email, password) {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            throw ApiError.BadRequest(`Некорректный email: ${email}`);
+        }
+
+        let PasswordRequest = "Password must "
+        if (password.length < 6) {
+            PasswordRequest += `contain at least 6 characters`
+            if (!/\d/.test(password)) {
+                PasswordRequest += ` and at least one digit`
+            }
+        }
+        if (password.length > 20) {
+            PasswordRequest += `contain no more than 20 characters`
+            if (!/\d/.test(password)) {
+                PasswordRequest += ` and at least one digit`
+            }
+        }
+        if (password.length >= 6 && password.length < 20 && !/\d/.test(password)) {
+            PasswordRequest += `contain at least one digit`
+        }
+        if (PasswordRequest !== "Password must ") {
+            throw ApiError.BadRequest(PasswordRequest);
+        }
         const candidate = await UserModel.findOne({email})
         if (candidate) {
-            throw ApiError.BadRequest(`Пользователь с почтовым адресом ${email} уже существует`)
+            throw ApiError.BadRequest(`User ${email} exists`)
         }
         const hashPassword = await bcrypt.hash(password, 3);
         const activationLink = uuid.v4(); // v34fa-asfasf-142saf-sa-asf
@@ -37,14 +61,14 @@ class UserService {
     async login(email, password) {
         const user = await UserModel.findOne({email})
         if (!user) {
-            throw ApiError.BadRequest('Пользователь с таким email не найден')
+            throw ApiError.BadRequest('User with email ' + email + ' not found');
         }
         const isPassEquals = await bcrypt.compare(password, user.password);
         if (!isPassEquals) {
-            throw ApiError.BadRequest('Неверный пароль');
+            throw ApiError.BadRequest('Incorrect password');
         }
-        if(!user.isActivated){
-            throw ApiError.BadRequest('Пользователь не активирован через почту')
+        if (!user.isActivated) {
+            throw ApiError.BadRequest('User not activated');
         }
         const userDto = new UserDto(user);
         const tokens = tokenService.generateTokens({...userDto});
@@ -60,14 +84,11 @@ class UserService {
 
     async refresh(refreshToken) {
         if (!refreshToken) {
-            // console.log("RefreshToken:", refreshToken)
             throw ApiError.UnauthorizedError();
         }
         const userData = tokenService.validateRefreshToken(refreshToken);
         const tokenFromDb = await tokenService.findToken(refreshToken);
         if (!userData || !tokenFromDb) {
-            // console.log('User Data:',userData);
-            // console.log('Token From Db:',tokenFromDb)
             throw ApiError.UnauthorizedError();
         }
         const user = await UserModel.findById(userData.id);

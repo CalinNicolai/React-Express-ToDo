@@ -27,7 +27,7 @@ class TaskService {
                     creationDate,
                     deadline,
                     category,
-                    userId
+                    userId,
                 },
                 {new: true} // Опция new: true возвращает обновленный документ
             );

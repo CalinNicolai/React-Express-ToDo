@@ -1,14 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { Modal as BootstrapModal, Form, Button } from 'react-bootstrap';
-import { ITask } from "../../UNIT/models/ITask";
+import React, {useState, useEffect} from 'react';
+import {Modal as BootstrapModal, Form, Button} from 'react-bootstrap';
+import {ITask} from "../../UNIT/models/ITask";
 import './Modal.css'
-
 interface ModalProps {
     isOpen: boolean;
     onClose: () => void;
     onSubmit: (formData: FormData) => void;
     data?: ITask | null
-    onChange: (formData: FormData) => void;
+    onChange: (formData: FormData, _id: string) => void;
     setSelectedTask: (set: ITask | null) => void;
 }
 
@@ -42,32 +41,30 @@ const Modal: React.FC<ModalProps> = ({
                                          setSelectedTask
                                      }) => {
     const [formData, setFormData] = useState<FormData>({
-        title: '',
-        description: '',
-        creationDate: '',
-        deadline: '',
-        category: 'Sport',
+        title: data?.title || '',
+        description: data?.description || '',
+        creationDate: data?.creationDate || '',
+        deadline: data?.deadline || '',
+        category: data?.category || '',
     });
 
     useEffect(() => {
-        if (data) {
-            setFormData(data);
-        } else {
+        if (isOpen && data) {
             setFormData({
-                title: '',
-                description: '',
-                creationDate: '',
-                deadline: '',
-                category: 'Sport',
+                title: data.title,
+                description: data.description,
+                creationDate: data.creationDate,
+                deadline: data.deadline,
+                category: data.category,
             });
         }
-    }, [data]);
+    }, [isOpen, data]);
+
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
-        const { name, value } = e.target;
-        const updatedFormData = { ...formData, [name]: value };
+        const {name, value} = e.target;
+        const updatedFormData = {...formData, [name]: value};
         setFormData(updatedFormData);
-        setSelectedTask(updatedFormData as ITask);
     };
 
     const getCurrentDay = () => {
@@ -77,8 +74,8 @@ const Modal: React.FC<ModalProps> = ({
 
     const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        const updatedFormData = { ...formData, creationDate: getCurrentDay() };
-        data ? onChange(updatedFormData) : onSubmit(updatedFormData);
+        const updatedFormData = {...formData, creationDate: getCurrentDay()};
+        data ? onChange(updatedFormData, data._id) : onSubmit(updatedFormData);
     };
 
     return (
@@ -124,7 +121,7 @@ const Modal: React.FC<ModalProps> = ({
                         <Form.Control
                             as="select"
                             name="category"
-                            value={formData.category}
+                            value={formData.category ? formData.category : 'Not selected'}
                             onChange={handleInputChange}
                         >
                             {categoryValues.map((category) => (
@@ -134,6 +131,7 @@ const Modal: React.FC<ModalProps> = ({
                             ))}
                         </Form.Control>
                     </Form.Group>
+
                     <Button className="m-2" variant="primary" type="submit">
                         {data ? "Save Changes" : "Add Task"}
                     </Button>

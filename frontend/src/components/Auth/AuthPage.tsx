@@ -1,22 +1,23 @@
 import React, {useContext, useEffect, useState} from "react";
 import './AuthStyle.css';
-import {Simulate} from "react-dom/test-utils";
-import submit = Simulate.submit;
 import {Context} from "../../index";
 import {observer} from "mobx-react-lite";
 import {useNavigate} from "react-router-dom";
+import {toast} from "react-toastify";
 
 
 const RegistrationForm: React.FC = () => {
     const [isRegistration, setIsRegistration] = useState(false);
-    const [username, setUsername] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [passwordVisible, setPasswordVisible] = useState(false);
+    const [confirmPassword, setConfirmPassword] = useState('');
     const {store} = useContext(Context);
     const navigate = useNavigate()
-    const handleUsernameChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setUsername(e.target.value);
+    const handleConfirmPasswordChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setConfirmPassword(e.target.value);
     };
+
 
     const handleEmailChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setEmail(e.target.value);
@@ -29,17 +30,23 @@ const RegistrationForm: React.FC = () => {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
+        if (password !== confirmPassword) {
+            toast.error('Passwords do not match');
+            return;
+        }
+
         if (isRegistration) {
-            store.registration(email,password);
+            store.registration(email, password);
         } else {
-            store.login(email,password);
+            store.login(email, password);
         }
     };
+
     useEffect(() => {
-        if(store.isAuth){
+        if (store.isAuth) {
             navigate('/');
         }
-    },[store.isAuth])
+    }, [store.isAuth])
     const toggleForm = () => {
         setIsRegistration(!isRegistration);
     };
@@ -47,20 +54,26 @@ const RegistrationForm: React.FC = () => {
     return (
         <div className="form-container">
             <form>
-                {isRegistration ? <h2>Регистрация</h2> : <h2>Вход</h2>}
+                {isRegistration ? <h2>Registration</h2> : <h2>Login</h2>}
                 <div>
                     <label>Email</label>
                     <input type="email" value={email} onChange={handleEmailChange}/>
                 </div>
                 <div>
-                    <label>Пароль</label>
+                    <label>Password</label>
                     <input type="password" value={password} onChange={handlePasswordChange}/>
+                    {isRegistration &&
+                        <>
+                            <label>Confirm Password</label>
+                            <input type="password" value={confirmPassword} onChange={handleConfirmPasswordChange}/>
+                        </>
+                    }
                 </div>
                 <button type="button" onClick={toggleForm}>
-                    {isRegistration ? 'Уже зарегистрированы?' : 'Вы не зарегистрировались?'}
+                    {isRegistration ? 'Already have an account?' : 'Don\'t have an account?'}
                 </button>
                 <button className="submit" type="button" onClick={handleSubmit}>
-                    {isRegistration ? 'Зарегистрироваться' : 'Войти'}
+                    {isRegistration ? 'Register' : 'Login'}
                 </button>
 
             </form>
