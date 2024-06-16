@@ -1,0 +1,34 @@
+.button{
+    width: 30px;
+    border: none;
+    background: transparent;
+    padding: 0;
+    color: white;
+    font-size: 20px;
+}
+.button:hover {
+    cursor: pointer;
+    text-decoration: none;
+    color: black;
+}
+.playpause-icon {
+    width: 30px; /* Уменьшаем размер иконки */
+    filter: invert(100%); /* Инвертируем цвет иконки */
+    transition: filter 0.3s; /* Добавляем плавный переход для изменения цвета */
+}
+
+.playpause-icon:hover {
+    filter: invert(0%); /* При наведении инвертируем цвет обратно */
+}
+
+.custom-range::-webkit-slider-thumb {
+    background: gray;
+}
+
+.custom-range::-moz-range-thumb {
+    background: gray;
+}
+
+.custom-range::-ms-thumb {
+    background: gray;
+}

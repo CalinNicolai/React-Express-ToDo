@@ -1,60 +1,85 @@
-import React, { useState } from 'react';
+import React, {useState} from 'react';
 import Howler from 'react-howler';
+import {Howler as HowlerJS} from 'howler';
+import './style.css';
+// @ts-ignore
+import song from './song.mp3';
+// @ts-ignore
+import song2 from './song2.mp3';
+// @ts-ignore
+import play from './play.png';
+// @ts-ignore
+import pause from './pause.png';
 
-const MusicPlayer = () => {
+const MusicPlayer: React.FC = () => {
     const [isPlaying, setIsPlaying] = useState(false);
-    const [volume, setVolume] = useState(1.0); // от 0.0 до 1.0
-    const [genre, setGenre] = useState('rock'); // начальный жанр
+    const [currentSong, setCurrentSong] = useState(song);
+    const [volume, setVolume] = useState(1.0);
 
-    const songs = {
-        rock: 'url-to-rock-song.mp3',
-        jazz: 'url-to-jazz-song.mp3',
-        classical: 'url-to-classical-song.mp3',
-        // добавьте больше жанров и URL-адресов песен по мере необходимости
-    };
+    const songs = [song, song2]; // Массив с песнями
 
-    const handlePlayPause = () => {
+    const handlePlayPause = async () => {
+        if (!isPlaying) {
+            try {
+                await HowlerJS.ctx.resume();
+            } catch (e) {
+                console.error('Error resuming audio context:', e);
+            }
+        }
         setIsPlaying(!isPlaying);
     };
 
-    const handleVolumeChange = (e:any) => {
+    const handleNextSong = () => {
+        const currentIndex = songs.indexOf(currentSong);
+        const nextIndex = (currentIndex + 1) % songs.length;
+        setCurrentSong(songs[nextIndex]);
+        if (isPlaying) {
+            setIsPlaying(false); // Остановить воспроизведение текущей песни
+            setTimeout(() => {
+                setIsPlaying(true); // Запустить воспроизведение следующей песни
+            }, 100);
+        }
+    };
+
+    const handlePrevSong = () => {
+        const currentIndex = songs.indexOf(currentSong);
+        const prevIndex = (currentIndex - 1 + songs.length) % songs.length;
+        setCurrentSong(songs[prevIndex]);
+        if (isPlaying) {
+            setIsPlaying(false); // Остановить воспроизведение текущей песни
+            setTimeout(() => {
+                setIsPlaying(true); // Запустить воспроизведение предыдущей песни
+            }, 100);
+        }
+    };
+
+    const handleVolumeChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setVolume(parseFloat(e.target.value));
     };
 
-    const handleGenreChange = (e:any) => {
-        setGenre(e.target.value);
-    };
-
     return (
-        <div>
+        <div className="d-flex align-items-center">
             <Howler
-                src={songs[genre as keyof typeof songs]}
+                src={currentSong}
                 playing={isPlaying}
                 volume={volume}
             />
-            <button onClick={handlePlayPause}>
-                {isPlaying ? 'Pause' : 'Play'}
+            <input
+                type="range"
+                min="0"
+                max="1"
+                step="0.01"
+                value={volume}
+                onChange={handleVolumeChange}
+                className="custom-range ml-2"
+                style={{width: '100px'}}
+            />
+            <button onClick={handlePrevSong} className="ml-2 button">&lt;</button>
+            <button onClick={handlePlayPause} className="ml-2 button">
+                {isPlaying ? <img src={pause} alt="Pause" className="playpause-icon"/> :
+                    <img src={play} alt="Play" className="playpause-icon"/>}
             </button>
-            <label>
-                Volume:
-                <input
-                    type="range"
-                    min="0"
-                    max="1"
-                    step="0.01"
-                    value={volume}
-                    onChange={handleVolumeChange}
-                />
-            </label>
-            <label>
-                Genre:
-                <select value={genre} onChange={handleGenreChange}>
-                    <option value="rock">Rock</option>
-                    <option value="jazz">Jazz</option>
-                    <option value="classical">Classical</option>
-                    {/* Добавьте больше опций жанра по мере необходимости */}
-                </select>
-            </label>
+            <button onClick={handleNextSong} className="ml-2 button">&gt;</button>
         </div>
     );
 };

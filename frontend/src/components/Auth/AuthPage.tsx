@@ -30,7 +30,7 @@ const RegistrationForm: React.FC = () => {
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (password !== confirmPassword) {
+        if (password !== confirmPassword && isRegistration) {
             toast.error('Passwords do not match');
             return;
         }

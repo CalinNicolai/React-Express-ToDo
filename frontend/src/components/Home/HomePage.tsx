@@ -3,7 +3,6 @@ import {useNavigate} from "react-router-dom";
 import {Context} from "../../index";
 import {observer} from "mobx-react-lite";
 import Navbar from "../Navbar/Navbar";
-import Footer from "../Footer/Footer";
 import './HomeStyle.css';
 import Modal from "../Modal/Modal";
 import TaskService from "../../UNIT/Services/TaskService";
@@ -11,8 +10,6 @@ import Tasks from "./Tasks/Tasks";
 import {toast} from "react-toastify";
 import {ITask} from "../../UNIT/models/ITask";
 import {Container} from "react-bootstrap";
-import MusicPlayer from "./MusicPlayer/MusicPlayer";
-
 const HomePage: React.FC = () => {
     const [tasks, setTasks] = useState<ITask[]>([]);
     const [isOpenModal, setModalOpen] = useState(false);
@@ -109,7 +106,6 @@ const HomePage: React.FC = () => {
         <>
             <Navbar/>
             <Container>
-                <MusicPlayer/>
                 {addTaskVisible && <button className="AddTask" onClick={() => openModal(false)}>+</button>}
                 {changeVisible ?
                     <Modal isOpen={isOpenModal} onSubmit={submitForm} onClose={closeModal}
