@@ -37,7 +37,7 @@ class UserService {
             throw ApiError.BadRequest(`User ${email} exists`)
         }
         const hashPassword = await bcrypt.hash(password, 3);
-        const activationLink = uuid.v4(); // v34fa-asfasf-142saf-sa-asf
+        const activationLink = uuid.v4();
 
         const user = await UserModel.create({email, password: hashPassword, activationLink})
         await mailService.sendActivationMail(email, `${process.env.API_URL}/api/activate/${activationLink}`);
@@ -52,7 +52,7 @@ class UserService {
     async activate(activationLink) {
         const user = await UserModel.findOne({activationLink})
         if (!user) {
-            throw ApiError.BadRequest('Неккоректная ссылка активации')
+            throw ApiError.BadRequest('Incorrect activation link');
         }
         user.isActivated = true;
         await user.save();
